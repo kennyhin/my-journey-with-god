@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Journey with God</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="cross">✝</div>
+  <h1>My Journey with God</h1>
+  <p class="tagline">"Trust in the Lord with all your heart" — Proverbs 3:5</p>
+</header>
+
+<nav class="site-nav">
+  <a href="index.html">Home</a>
+  <a href="dashboard.html">Write a Post</a>
+</nav>
+
+<main>
+  <div class="verse-banner" id="verse-banner"></div>
+
+  <div id="posts"></div>
+</main>
+
+<footer class="site-footer">
+  Soli Deo Gloria — to God alone be the glory.
+</footer>
+
+<script src="app.js"></script>
+<script>
+  const verse = verseOfTheDay();
+  document.getElementById("verse-banner").innerHTML =
+    `"${escapeHtml(verse.text)}" <span class="ref">${escapeHtml(verse.ref)}</span>`;
+
+  function render() {
+    const posts = getPosts().slice().reverse();
+    const container = document.getElementById("posts");
+
+    if (posts.length === 0) {
+      container.innerHTML = `<div class="empty-state">No posts yet. Head to <a href="dashboard.html">Write a Post</a> to share the first entry of your journey.</div>`;
+      return;
+    }
+
+    container.innerHTML = posts.map(p => `
+      <article class="post">
+        <h2>${escapeHtml(p.title)}</h2>
+        <div class="meta">${formatDate(p.createdAt)}</div>
+        <div class="content">${p.content}</div>
+      </article>
+    `).join("");
+  }
+
+  render();
+</script>
+
+</body>
+</html>

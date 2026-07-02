@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Write a Post — My Journey with God</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="cross">✝</div>
+  <h1>My Journey with God</h1>
+  <p class="tagline">A quiet place to write</p>
+</header>
+
+<nav class="site-nav">
+  <a href="index.html">Home</a>
+  <a href="dashboard.html">Write a Post</a>
+</nav>
+
+<main>
+
+  <!-- Access gate -->
+  <div class="gate-box" id="gate-box">
+    <div class="cross">🔒</div>
+    <h2 id="gate-title">Enter Your Code</h2>
+    <p id="gate-sub" style="color:#9a8f77; font-size:0.9rem;"></p>
+    <input type="password" id="code-input" placeholder="••••••" autocomplete="off" maxlength="20">
+    <div class="gate-error" id="gate-error"></div>
+    <button id="gate-submit">Enter</button>
+  </div>
+
+  <!-- Dashboard (hidden until unlocked) -->
+  <div id="dashboard" style="display:none;">
+    <div class="dash-header">
+      <h2 style="color:var(--deep-blue); margin:0;">Your Dashboard</h2>
+      <a href="#" class="logout" id="lock-btn">Lock &amp; leave</a>
+    </div>
+
+    <div class="editor-wrap">
+      <input type="text" id="post-title" placeholder="Give your post a title...">
+
+      <div class="toolbar">
+        <button type="button" data-cmd="bold"><b>B</b></button>
+        <button type="button" data-cmd="italic"><i>i</i></button>
+        <button type="button" id="highlight-btn">✨ Highlight</button>
+        <button type="button" id="verse-btn">📖 Set Apart Verse</button>
+      </div>
+
+      <div id="editor" contenteditable="true" placeholder="Share what God is teaching you..."></div>
+
+      <div class="editor-footer">
+        <span class="hint" id="editor-hint">Select text, then click Highlight or Set Apart Verse to emphasize it.</span>
+        <button class="btn-primary" id="publish-btn">Publish Post</button>
+      </div>
+    </div>
+
+    <div class="post-list-mini">
+      <h3>Your Posts</h3>
+      <div id="mini-list"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  Soli Deo Gloria — to God alone be the glory.
+</footer>
+
+<script src="app.js"></script>
+<script>
+  const gateBox = document.getElementById("gate-box");
+  const dashboard = document.getElementById("dashboard");
+  const gateTitle = document.getElementById("gate-title");
+  const gateSub = document.getElementById("gate-sub");
+  const gateError = document.getElementById("gate-error");
+  const codeInput = document.getElementById("code-input");
+  const gateSubmit = document.getElementById("gate-submit");
+
+  const existingCode = localStorage.getItem(CODE_KEY);
+
+  if (!existingCode) {
+    gateTitle.textContent = "Set Your Access Code";
+    gateSub.textContent = "Choose a code you'll remember. You'll use it to access your writing space.";
+  } else {
+    gateTitle.textContent = "Enter Your Code";
+    gateSub.textContent = "This keeps your writing space just for you.";
+  }
+
+  function unlock() {
+    gateBox.style.display = "none";
+    dashboard.style.display = "block";
+    renderMiniList();
+  }
+
+  function tryEnter() {
+    const val = codeInput.value.trim();
+    if (!val) {
+      gateError.textContent = "Please enter a code.";
+      return;
+    }
+    const stored = localStorage.getItem(CODE_KEY);
+    if (!stored) {
+      if (val.length < 4) {
+        gateError.textContent = "Please choose a code with at least 4 characters.";
+        return;
+      }
+      localStorage.setItem(CODE_KEY, val);
+      unlock();
+    } else if (val === stored) {
+      unlock();
+    } else {
+      gateError.textContent = "That code doesn't match. Try again.";
+      codeInput.value = "";
+    }
+  }
+
+  gateSubmit.addEventListener("click", tryEnter);
+  codeInput.addEventListener("keydown", e => { if (e.key === "Enter") tryEnter(); });
+
+  document.getElementById("lock-btn").addEventListener("click", e => {
+    e.preventDefault();
+    location.reload();
+  });
+
+  // ---- Editor toolbar ----
+  const editor = document.getElementById("editor");
+
+  document.querySelectorAll(".toolbar button[data-cmd]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      editor.focus();
+      document.execCommand(btn.dataset.cmd, false, null);
+    });
+  });
+
+  const editorHint = document.getElementById("editor-hint");
+  let hintTimer = null;
+  function flashHint(msg) {
+    editorHint.textContent = msg;
+    editorHint.style.color = "#a34848";
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => {
+      editorHint.textContent = "Select text, then click Highlight or Set Apart Verse to emphasize it.";
+      editorHint.style.color = "";
+    }, 3000);
+  }
+
+  function wrapSelection(tagHtmlOpen, tagHtmlClose) {
+    editor.focus();
+    const sel = window.getSelection();
+    if (!sel.rangeCount || sel.isCollapsed) {
+      flashHint("First select some text in your post, then click this button.");
+      return;
+    }
+    const range = sel.getRangeAt(0);
+    const selectedText = range.toString();
+    const wrapper = document.createElement("template");
+    wrapper.innerHTML = tagHtmlOpen + escapeHtml(selectedText) + tagHtmlClose;
+    range.deleteContents();
+    range.insertNode(wrapper.content);
+    sel.removeAllRanges();
+  }
+
+  document.getElementById("highlight-btn").addEventListener("click", () => {
+    wrapSelection('<mark class="highlight">', "</mark>");
+  });
+
+  document.getElementById("verse-btn").addEventListener("click", () => {
+    wrapSelection('<blockquote class="verse">', "</blockquote>");
+  });
+
+  // ---- Publish ----
+  document.getElementById("publish-btn").addEventListener("click", () => {
+    const title = document.getElementById("post-title").value.trim();
+    const content = editor.innerHTML.trim();
+
+    if (!title) {
+      flashHint("Please give your post a title.");
+      return;
+    }
+    if (!content || content === "<br>") {
+      flashHint("Please write something before publishing.");
+      return;
+    }
+
+    const posts = getPosts();
+    posts.push({
+      id: Date.now().toString(),
+      title,
+      content,
+      createdAt: new Date().toISOString()
+    });
+    savePosts(posts);
+
+    document.getElementById("post-title").value = "";
+    editor.innerHTML = "";
+    renderMiniList();
+    editorHint.textContent = "Your post has been published! View it on the Home page.";
+    editorHint.style.color = "#3f7a4a";
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => {
+      editorHint.textContent = "Select text, then click Highlight or Set Apart Verse to emphasize it.";
+      editorHint.style.color = "";
+    }, 4000);
+  });
+
+  function renderMiniList() {
+    const posts = getPosts().slice().reverse();
+    const list = document.getElementById("mini-list");
+    if (posts.length === 0) {
+      list.innerHTML = `<div class="empty-state" style="padding:1rem 0;">Nothing published yet.</div>`;
+      return;
+    }
+    list.innerHTML = posts.map(p => `
+      <div class="mini-item">
+        <span>${escapeHtml(p.title)} — ${formatDate(p.createdAt)}</span>
+        <button data-id="${p.id}">Delete</button>
+      </div>
+    `).join("");
+
+    list.querySelectorAll("button[data-id]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (btn.dataset.confirming !== "true") {
+          btn.dataset.confirming = "true";
+          const original = btn.textContent;
+          btn.textContent = "Click again to confirm";
+          setTimeout(() => {
+            btn.dataset.confirming = "false";
+            btn.textContent = original;
+          }, 3000);
+          return;
+        }
+        const remaining = getPosts().filter(p => p.id !== btn.dataset.id);
+        savePosts(remaining);
+        renderMiniList();
+      });
+    });
+  }
+</script>
+
+</body>
+</html>
