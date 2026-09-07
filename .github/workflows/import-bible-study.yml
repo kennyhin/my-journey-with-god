@@ -1,0 +1,34 @@
+name: Import bible study static site
+
+on:
+  push:
+    paths:
+      - ".github/workflows/import-bible-study.yml"
+      - "bible-study/.import-url"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and extract static export
+        run: |
+          set -euo pipefail
+          URL=$(tr -d '\n' < bible-study/.import-url)
+          echo "Downloading $URL"
+          curl -fL --retry 5 --retry-delay 2 -o /tmp/bible-study-pages.tgz "$URL"
+          file /tmp/bible-study-pages.tgz
+          tar tzf /tmp/bible-study-pages.tgz | wc -l
+          tar xzf /tmp/bible-study-pages.tgz
+          printf '%s\n' '# You'\''re Cheating On God — Bible Study' '' 'Open the live study: https://kennyhin.github.io/my-journey-with-god/bible-study/' > bible-study/README.md
+          printf '\n' > bible-study/.nojekyll
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A bible-study
+          git status
+          git commit -m "Publish Bible study static site" || echo "No changes to commit"
+          git push
