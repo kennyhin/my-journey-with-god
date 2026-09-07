@@ -1,0 +1,55 @@
+
+:root { --bg:#f6efe4; --ink:#3a2c22; --muted:#6b5748; --card:#fffaf3; --line:#e4d5c3; --pri:#7a2e24; --serif:"Source Serif 4", Georgia, serif; --head:"Cormorant Garamond", Georgia, serif; }
+* { box-sizing:border-box; }
+html,body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 system-ui,sans-serif; }
+h1,h2,h3,.q { font-family:var(--head); font-weight:600; }
+h1 { font-size:2.1rem; margin:.2rem 0 .6rem; }
+h2 { font-size:1.55rem; margin:2rem 0 .6rem; }
+a { color:var(--pri); }
+.nav-check { position:absolute; left:-9999px; }
+header { position:sticky; top:0; z-index:5; display:flex; gap:.75rem; align-items:center; padding:.8rem 1rem; background:rgba(246,239,228,.92); border-bottom:1px solid var(--line); backdrop-filter:blur(8px); }
+.brand { text-decoration:none; color:inherit; min-width:0; }
+.brand strong { display:block; font-family:var(--head); font-size:1.35rem; }
+.brand span { display:block; color:var(--muted); font-size:.75rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.menu { display:none; border:1px solid var(--line); border-radius:.5rem; padding:.35rem .7rem; cursor:pointer; background:var(--card); }
+.wrap { display:flex; gap:2rem; max-width:72rem; margin:0 auto; padding:1.5rem 1rem 4rem; }
+aside { width:15rem; flex:none; }
+aside nav { display:flex; flex-direction:column; gap:.15rem; }
+aside a { text-decoration:none; color:var(--muted); padding:.4rem .6rem; border-radius:.5rem; }
+aside a.on, aside a:hover { background:#efe4d4; color:var(--pri); }
+.sessions a { display:flex; gap:.45rem; align-items:flex-start; font-size:.92rem; }
+.num { display:inline-flex; width:1.3rem; height:1.3rem; flex:none; align-items:center; justify-content:center; border:1px solid var(--line); border-radius:99px; font-size:.7rem; margin-top:.15rem; }
+main { min-width:0; flex:1; max-width:44rem; }
+.kicker { letter-spacing:.16em; text-transform:uppercase; font-size:.7rem; color:var(--muted); }
+.lede,.serif { font-family:var(--serif); font-size:1.12rem; }
+.note,.muted { color:var(--muted); }
+.actions { display:flex; flex-wrap:wrap; gap:.5rem; }
+.btn { display:inline-block; background:var(--pri); color:#fff; text-decoration:none; border-radius:.5rem; padding:.4rem .8rem; }
+.btn.ghost { background:var(--card); color:var(--ink); border:1px solid var(--line); }
+.video { aspect-ratio:16/9; background:#000; border-radius:.8rem; overflow:hidden; margin:1.2rem 0; }
+.video iframe { width:100%; height:100%; border:0; }
+.prayer,.study,.verse,.beat,.caution,.qs { background:var(--card); border:1px solid var(--line); border-radius:.8rem; padding:1rem 1.1rem; margin:1rem 0; }
+.cards { display:flex; flex-direction:column; gap:.7rem; }
+.card { display:flex; gap:.8rem; text-decoration:none; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:.8rem; padding:1rem; }
+.card em { display:block; color:var(--muted); font-style:normal; }
+.card small { display:block; margin-top:.35rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+blockquote { font-family:var(--serif); margin:0; }
+.said { border-left:4px solid var(--pri); padding:.8rem 1rem; background:var(--card); }
+.words { list-style:none; padding:0; }
+.words li { border-left:2px solid #d7b7aa; padding:.2rem 0 .2rem .7rem; margin:.5rem 0; }
+.words span { display:block; color:var(--muted); }
+details { border-bottom:1px solid var(--line); }
+details:last-child { border-bottom:0; }
+summary { cursor:pointer; list-style:none; padding:.9rem 0; }
+summary::-webkit-details-marker { display:none; }
+.q { display:block; font-size:1.05rem; }
+.pad { padding:0 0 1rem; }
+.answer { background:#f3ece3; border-radius:.6rem; padding:.8rem 1rem; margin-top:.7rem; }
+textarea { width:100%; border:1px solid var(--line); border-radius:.7rem; padding:.8rem; font:1rem/1.5 var(--serif); background:var(--card); }
+.pager { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:space-between; margin-top:2rem; }
+.badge { display:inline-block; margin:.15rem .2rem 0 0; padding:.1rem .45rem; border-radius:99px; background:#efe4d4; text-decoration:none; font-size:.78rem; }
+@media (max-width:900px) {
+  .menu { display:inline-block; }
+  aside { display:none; position:fixed; left:0; top:3.6rem; bottom:0; width:min(22rem,100%); overflow:auto; background:var(--bg); padding:1rem; border-right:1px solid var(--line); z-index:6; }
+  .nav-check:checked ~ .wrap aside { display:block; }
+}
