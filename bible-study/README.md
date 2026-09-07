@@ -1,3 +1,3 @@
 # You're Cheating On God — Bible Study
 
-This folder will host the interactive study.
+Open the live study: https://kennyhin.github.io/my-journey-with-god/bible-study/
